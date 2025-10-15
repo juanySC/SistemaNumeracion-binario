@@ -4,12 +4,7 @@ package org.example;
 import java.time.LocalTime;
 
 public class MostrarReloj {
-    //atributos
-    LocalTime horaActual = LocalTime.now();
-    //utilizo horaActual para obtener los siguientes parametros
-    int hora = horaActual.getHour();
-    int minuto = horaActual.getMinute();
-    int segundo = horaActual.getSecond();
+
 
     //metodos
 
@@ -18,11 +13,25 @@ public class MostrarReloj {
      * de un arreglo de int
      **/
     public int[] getHoraActual() {
+        //atributos
+        LocalTime horaActual = LocalTime.now();
+        //utilizo horaActual para obtener los siguientes parametros
+        int hora = horaActual.getHour();
+        int minuto = horaActual.getMinute();
+        int segundo = horaActual.getSecond();
         return new int[]{hora, minuto, segundo};
     }
 
     /**getFormatoHoraActual manejo de un formato estandar para la hora**/
     public String getFormatoHoraActual() {
+        //creando mi vector con la hora
+        int []obteniendoHora = getHoraActual();
+
+        //simplemente son las posiciones del vector
+        int hora = obteniendoHora[0];
+        int minuto = obteniendoHora[1];
+        int segundo = obteniendoHora[2];
+
         // %02d= los espacios que tendran los numeros
         return String.format("%02d:%02d:%02d", hora, minuto, segundo);
     }
