@@ -4,28 +4,29 @@ package org.example.reloj;
 
 public class ConversorBase {
 
-    public String enteroBinario(int numero){
-        //utilizare StringBuilder para construir la cadena necesaria
-        StringBuilder binario = new StringBuilder();
-        //para esto se tiene que obtener los residuos
+    /**decimalABase nos ayuda a obtener la hora en base 10 y a transformarla en base
+     * 2,8 y 16, es tipo String porque sera alfanumerico para la base 16
+     * @param numero me ayuda a obtener el numero de la hora actual
+     * @param base es a que tipo de base voy a convertir**/
+    public String decimalABase(int numero, int base){
+        //si el numero fuera 0 regreso 0
         if (numero == 0){
-            return "0";
-        }else if (numero < 0){
-            //tiro una excepcion
-        throw  new IllegalArgumentException ("La conversion tiene que ser con numeros positivos, vuelva a intentar");
+            return  "0";
         }
 
-        //guarda la cadena de resultado
-        String hex = "0123456789ABCDEF";
-        //creo mi numero temporal para que cada uno vaya a una lista y se añada
+        //condiciones para las bases
+        //creo una cadena para mi base hexadecima ya que incluye letras
+        String hexadecimal = "0123456789ABCDEF";
+
+        //construyo la cadena de resultado
+        StringBuilder resultado = new StringBuilder();
+        //para no modificar mi resultado original y este se vaya actualizando cada que pasa en la condicion
         int numTemp = numero;
 
-        while (numTemp > 0){
-            binario.insert(0, hex.charAt(numTemp % 2));
-            numTemp = numTemp / 2;
+        //condicion para dividir el numero entre la base siempre que sea mayor que cero
+        while (numTemp>0){
+            
         }
-
-        return binario.toString();
 
     }
 }

@@ -56,9 +56,7 @@ public class Main {
         System.out.println("\nReloj apagado.");
         scanner.close();
 
-        //probando mi clase de conversor para decimal a binario
-        ConversorBase base = new ConversorBase();
-        System.out.println(base.enteroBinario(10));
+
 
     }
 
