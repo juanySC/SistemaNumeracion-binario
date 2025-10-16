@@ -25,8 +25,21 @@ public class ConversorBase {
 
         //condicion para dividir el numero entre la base siempre que sea mayor que cero
         while (numTemp>0){
-            
-        }
+            //divido respecto a la base
+            int residuo = numTemp % base;
 
+            //para hexadecimal necesito ontener la posicion
+
+                //variable hexadecimal: me ayuda a buscar en la propia cadena que caracter elegir
+                //insert nos ayuda a insertar en la posicion 0 el caracter que obtengo de la cadena hexadecimal
+                //charAt obtiene el caracter una posicion especifica
+                resultado.insert(0, hexadecimal.charAt(residuo));
+
+            //ahora con lo que me queda sigo operando
+
+            numTemp = numTemp/base;
+        }
+        //retorno el StringBuilder ya convertido en un String
+        return resultado.toString();
     }
 }

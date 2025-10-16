@@ -5,56 +5,45 @@ import org.example.reloj.MostrarReloj;
 
 import java.util.Scanner;
 
+import static java.lang.Thread.sleep;
+
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
+    //creando los objetos de las clases
     private static final MostrarReloj reloj = new MostrarReloj();
+    private static final ConversorBase conversor = new ConversorBase();
+
     public static void main(String[] args) throws InterruptedException {
 
+        while (true){
+            // Limpia la consola para simular la actualización del reloj
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
 
-    //prueba de clase MOSTRAR RELOJ
-        Scanner scanner = new Scanner(System.in);
-        String comando = "";
+            //para obtener mi hora
+            int[] horaActual = reloj.getHoraActual();
+            int hora = horaActual[0];
+            int minuto = horaActual[1];
+            int segundo = horaActual[2];
 
-        System.out.println("--- RELOJ ---");
-        System.out.println("Presione ENTER para iniciar. (Presione S para Salir en cualquier momento)");
-        scanner.nextLine();
+            //muestro la hora en base 10 (lo que obtengo en si de la compu
+            System.out.println("La hora en base 10 es: " + reloj.getFormatoHoraActual());
 
-        // **LA CLAVE DEL TIEMPO REAL: El bucle while**
-        while (!comando.equalsIgnoreCase("S")) {
+            //obtendre la hora de base 10 a base 2
+            String binarioHora = conversor.decimalABase(hora, 2);
+            String binarioMinuto = conversor.decimalABase(minuto, 2);
+            String binarioSegundo = conversor.decimalABase(segundo, 2);
+            //muestro el resultado
+            System.out.printf("La hora en base 2 es: %s : %s : %s\n",binarioHora, binarioMinuto, binarioSegundo);
 
-            try {
-                // 1. Limpia la consola para que el reloj "se mueva" en el mismo lugar
-                System.out.print("\033[H\033[2J");
-                System.out.flush();
 
-                // 2. Obtiene e imprime la hora actualizada
-                System.out.println("=".repeat(40));
-                System.out.println("| HORA ACTUAL (Base 10): " + reloj.getFormatoHoraActual());
-                System.out.println("=".repeat(40));
+            //hare una pausa de 1 segundo
+            Thread.sleep(1000);
+            //obtengo la hora actual con mi metodo de mostrar reloj
+            System.out.println("Hora actual: " + reloj.getFormatoHoraActual());
 
-                // Aquí en el futuro irán las conversiones a Binario, Octal, y Hexadecimal.
-
-                // 3. Menú e ingreso de comando (no bloqueante)
-                System.out.println("\nS Salir");
-                if (scanner.hasNextLine()) {
-                    // Lee el comando (si hay entrada disponible)
-                    comando = scanner.nextLine();
-                }
-
-                // 4. Pausa de 1 segundo (1000 milisegundos)
-                Thread.sleep(500);
-
-            } catch (InterruptedException e) {
-                // Manejo de la interrupción del hilo
-                Thread.currentThread().interrupt();
-                System.out.println("Reloj detenido.");
-                break;
-            }
         }
-
-        System.out.println("\nReloj apagado.");
-        scanner.close();
 
 
 
