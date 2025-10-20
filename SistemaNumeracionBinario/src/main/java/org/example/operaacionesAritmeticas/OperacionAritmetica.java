@@ -26,7 +26,8 @@ public class OperacionAritmetica {
 
     }
 
-    /**sumaBinaria contiene la logica par apoder sumar dos horas**/
+    /**sumaBinaria contiene la logica para poder sumar dos horas
+     * comparando logitudes**/
     public String sumaBinaria(String binario1, String binario2){
         //comparo la longitud de ambas cadenas de binarios{
         int longitudMaxima ;
@@ -40,6 +41,31 @@ public class OperacionAritmetica {
 
         //Se necesita llevar el valor de acarreo (0, 1) para la siguient ecolumna
         int acarrero = 0;
+        StringBuilder resultado = new StringBuilder();
+
+        //recorro de dereha a izquerda la cadena
+        for (int i = longitudMaxima -1; i >= 0 ; i--) {
+            // obteno el binraio por ejemplo en posicion '1' - '0' = 1
+            // binrario '0' - '0' = 0
+            int bit1 = binario1.charAt(i) -'0';
+            int bit2 = binario2.charAt(i) -'0';
+
+            //calculo la seuma
+            int suma = bit1 + bit2 + acarrero;
+
+            //se basa en el resultao de la suma
+            //obtenemos el bit resultado por ejemlo 2/2 = 1 residuo 0   o  3/2 = 1 residuo 1
+            int bitResultante = suma % 2;
+
+            //se basa en el resultao de la suma
+            //ejemplo 2/2 =1 acarreo  o   0/2=1 acarreo 0
+            acarrero = suma / 2;
+
+            //inserto el bit resultante en la posicion 0
+            resultado.insert(0, bitResultante);
+
+        }
+
 
     }
 
