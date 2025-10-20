@@ -28,6 +28,18 @@ public class OperacionAritmetica {
 
     /**sumaBinaria contiene la logica par apoder sumar dos horas**/
     public String sumaBinaria(String binario1, String binario2){
+        //comparo la longitud de ambas cadenas de binarios{
+        int longitudMaxima ;
+        if (binario1.length() >= binario2.length()) {
+            longitudMaxima = binario1.length();
+            binario2 = completarConCeros(binario2, longitudMaxima);
+        } else{
+            longitudMaxima = binario2.length();
+            binario1 = completarConCeros(binario1, longitudMaxima);
+        }
+
+        //Se necesita llevar el valor de acarreo (0, 1) para la siguient ecolumna
+        int acarrero = 0;
 
     }
 

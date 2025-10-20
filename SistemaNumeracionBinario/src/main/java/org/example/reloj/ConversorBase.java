@@ -9,6 +9,7 @@ public class ConversorBase {
      * @param numero me ayuda a obtener el numero de la hora actual
      * @param base es a que tipo de base voy a convertir**/
     public String decimalABase(int numero, int base){
+        if (base < 2 || base > 16) throw new IllegalArgumentException("Base debe ser entre 2 y 16");
         //si el numero fuera 0 regreso 0
         if (numero == 0){
             return  "0";
