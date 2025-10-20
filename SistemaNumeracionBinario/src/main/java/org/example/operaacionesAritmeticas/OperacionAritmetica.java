@@ -66,7 +66,13 @@ public class OperacionAritmetica {
 
         }
 
+        //si al final de la suma el acarreo es 1 se agrega al inicio
+        if (acarrero == 1){
+            resultado.insert(0, 1);
+        }
 
+        //para obtener la cadena que se genero
+        return resultado.toString();
     }
 
 }
