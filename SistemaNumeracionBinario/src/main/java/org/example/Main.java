@@ -53,10 +53,36 @@ public class Main {
         System.out.println(">>> INICIANDO RELOJ... <<<");
     }
 
+
+    /**
+     * Método auxiliar para probar SOLO la función de Complemento a Uno.
+     */
+    private static void testComplementoUno() {
+        System.out.println("--- PRUEBAS DE COMPLEMENTO A UNO (C1) ---");
+
+        // Caso 1: Binario de 8 bits (00001010 = 10 en decimal)
+        String binario1 = "00001010";
+        String c1_1 = calculadora.complementoAuno(binario1);
+
+        System.out.printf("Original 1 (8 bits): %s\n", binario1);
+        System.out.printf("C1 Resultado:        %s (Esperado: 11110101)\n", c1_1);
+
+        // Caso 2: Binario de 4 bits (1100 = 12 en decimal)
+        String binario2 = "1100";
+        String c1_2 = calculadora.complementoAuno(binario2);
+
+        System.out.printf("\nOriginal 2 (4 bits): %s\n", binario2);
+        System.out.printf("C1 Resultado:        %s (Esperado: 0011)\n", c1_2);
+
+        System.out.println("\n=========================================");
+    }
+
     public static void main(String[] args) throws InterruptedException {
 
         //llamndo a mi suma binaria para probar su funcionamiento
         sumaBinaria();
+        testComplementoUno();
+
         System.out.println("");
         while (true){
             System.out.println("");

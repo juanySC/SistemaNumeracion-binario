@@ -75,4 +75,24 @@ public class OperacionAritmetica {
         return resultado.toString();
     }
 
+
+    /**complementoAuno : ayudara a tener la inversa por ejemplo: binrario original  0101 (5) a la
+     * complementoAuno: 1010 (-5, provisionalmente)**/
+    public String complementoAuno(String binario) {
+        StringBuilder complemento = new StringBuilder();
+
+        //recorro la cadena binaria
+        for (int i = 0; i < binario.length(); i++) {
+            //obtengo el bit actual
+            char bitActual = binario.charAt(i);
+            //si es 0 lo cambio a 1 y viceversa
+            if (bitActual == '0') {
+                complemento.append('1');
+            } else {
+                complemento.append('0');
+            }
+        }
+
+        return complemento.toString();
+    }
 }
