@@ -50,7 +50,6 @@ public class Main {
         System.out.println("  Resultado: " + resultado4 + " (Esperado: 100011)");
 
         System.out.println("\n=========================================");
-        System.out.println(">>> INICIANDO RELOJ... <<<");
     }
 
 
@@ -77,12 +76,86 @@ public class Main {
         System.out.println("\n=========================================");
     }
 
+    // MODIFICACIÓN CLAVE: Método auxiliar para probar el Complemento a Dos (C2)
+    private static void testComplementoDos() {
+        System.out.println("--- PRUEBAS DE COMPLEMENTO A DOS (C2) ---");
+
+        // Caso 1: C2 de 5 (0101) en 4 bits. C1="1010". C2="1011". Representa -5.
+        String binario1 = "0101";
+        String c2_1 = calculadora.complementoAdos(binario1);
+
+        System.out.printf("Original 1 (5): %s\n", binario1);
+        System.out.printf("C2 Resultado:   %s (Esperado: 1011, que es -5)\n", c2_1);
+
+        // Caso 2: C2 de 1 (0001) en 4 bits. C1="1110". C2="1111". Representa -1.
+        String binario2 = "0001";
+        String c2_2 = calculadora.complementoAdos(binario2);
+
+        System.out.printf("\nOriginal 2 (1): %s\n", binario2);
+        System.out.printf("C2 Resultado:   %s (Esperado: 1111, que es -1)\n", c2_2);
+
+        // Caso 3: C2 de 8 (1000) en 4 bits. C1="0111". C2="1000". Representa -8.
+        String binario3 = "1000";
+        String c2_3 = calculadora.complementoAdos(binario3);
+
+        System.out.printf("\nOriginal 3 (8): %s\n", binario3);
+        System.out.printf("C2 Resultado:   %s (Esperado: 1000, que es -8)\n", c2_3);
+
+        System.out.println("\n=========================================");
+    }
+
+    // MODIFICACIÓN CLAVE: Método auxiliar para probar la Resta Binaria usando C2
+    private static void testRestaBinaria() {
+        System.out.println("--- PRUEBAS DE RESTA BINARIA (A - B) CON C2 ---");
+
+        // Caso 1: Positivo - Menor Positivo -> Resultado Positivo (8 - 3 = 5). Usando 4 bits.
+        // 8 (1000) - 3 (0011) -> 1000 + C2(0011) = 1000 + 1101 = 10101 (se ignora el acarreo) -> Resultado: 0101 (5)
+        String b1_caso1 = "1000"; // 8
+        String b2_caso1 = "0011"; // 3
+        String resta1 = calculadora.restaBinaria(b1_caso1, b2_caso1);
+        System.out.println("Caso 1: 8 (1000) - 3 (0011) = 5");
+        System.out.println("  Resultado: " + resta1 + " (Esperado: 0101)");
+
+        // Caso 2: Positivo - Mayor Positivo -> Resultado Negativo (3 - 8 = -5). Usando 4 bits.
+        // 3 (0011) - 8 (1000) -> 0011 + C2(1000) = 0011 + 1000 = 1011 (no hay acarreo) -> Resultado: 1011 (-5)
+        String b1_caso2 = "0011"; // 3
+        String b2_caso2 = "1000"; // 8
+        String resta2 = calculadora.restaBinaria(b1_caso2, b2_caso2);
+        System.out.println("\nCaso 2: 3 (0011) - 8 (1000) = -5");
+        System.out.println("  Resultado: " + resta2 + " (Esperado: 1011)");
+
+        // Caso 3: Resta con alineación (10 - 2 = 8). Alineado a 4 bits.
+        // 10 (1010) - 2 (0010) -> 1010 + C2(0010) = 1010 + 1110 = 11000 (se ignora el acarreo) -> Resultado: 1000 (8)
+        String b1_caso3 = "1010"; // 10
+        String b2_caso3 = "10";   // 2 (será 0010 al alinearse)
+        String resta3 = calculadora.restaBinaria(b1_caso3, b2_caso3);
+        System.out.println("\nCaso 3: 10 (1010) - 2 (10) = 8");
+        System.out.println("  Resultado: " + resta3 + " (Esperado: 1000)");
+
+        // Caso 4: Resta de dos números iguales (7 - 7 = 0). Usando 4 bits.
+        // 7 (0111) - 7 (0111) -> 0111 + C2(0111) = 0111 + 1001 = 10000 (se ignora el acarreo) -> Resultado: 0000 (0)
+        String b1_caso4 = "0111"; // 7
+        String b2_caso4 = "0111"; // 7
+        String resta4 = calculadora.restaBinaria(b1_caso4, b2_caso4);
+        System.out.println("\nCaso 4: 7 (0111) - 7 (0111) = 0");
+        System.out.println("  Resultado: " + resta4 + " (Esperado: 0000)");
+
+        System.out.println("\n=========================================");
+    }
+
+
     public static void main(String[] args) throws InterruptedException {
 
         //llamndo a mi suma binaria para probar su funcionamiento
         sumaBinaria();
         testComplementoUno();
+        // MODIFICACIÓN CLAVE: Llamada al método de prueba del Complemento a Dos
+        testComplementoDos();
+        // MODIFICACIÓN CLAVE: Llamada al método de prueba de la Resta Binaria
+        testRestaBinaria();
 
+
+        System.out.println(">>> INICIANDO RELOJ... <<<");
         System.out.println("");
         while (true){
             System.out.println("");
