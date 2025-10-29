@@ -3,6 +3,7 @@ package org.example;
 import org.example.operaacionesAritmeticas.OperacionAritmetica;
 import org.example.reloj.ConversorBase;
 import org.example.reloj.MostrarReloj;
+import org.example.reloj.RelojPantalla;
 
 import java.util.Scanner;
 
@@ -15,6 +16,7 @@ public class Main {
     private static final MostrarReloj reloj = new MostrarReloj();
     private static final ConversorBase conversor = new ConversorBase();
     private static final OperacionAritmetica calculadora = new OperacionAritmetica();
+
 
 
     /**
@@ -292,7 +294,18 @@ public class Main {
     }
 
     public static void main(String[] args) throws InterruptedException {
+        RelojPantalla relojPantalla = new RelojPantalla(reloj, conversor);
 
+        // Crear un hilo separado para el reloj (así puedes seguir usando el menú)
+        Thread hiloReloj = new Thread(() -> {
+            try {
+                relojPantalla.iniciarRelojConsola();
+            } catch (InterruptedException e) {
+                System.out.println("Reloj detenido.");
+            }
+        });
+
+        hiloReloj.start(); // inicia el reloj “en vivo”
         //llamando a menu
         menu();
 
