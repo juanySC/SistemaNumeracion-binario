@@ -16,6 +16,7 @@ public class Main {
     private static final ConversorBase conversor = new ConversorBase();
     private static final OperacionAritmetica calculadora = new OperacionAritmetica();
 
+
     /**
      * Método auxiliar para probar la lógica de suma binaria antes de iniciar el reloj.
      */
@@ -144,7 +145,85 @@ public class Main {
     }
 
 
+    /**horasAutomatico toma dos horas de la computadora y me da 3 segundos de diferencia para poder agarrar
+     * las dos horas**/
+    public static void horasAutomatico ()throws InterruptedException{
+        System.out.println("\n--------- Hora automatica -----------");
+
+        //creo un arreglo para obtener las horas
+        int[] horaActual1 = reloj.getHoraActual();
+        Thread.sleep(3000); // Espera 3 segundos antes de obtener el demas
+        int[] horaActual2 = reloj.getHoraActual();
+
+        int hora1 = horaActual1[0];
+        int hora2 = horaActual2[0];
+
+        //utilizo mi metodo para pasarlo a mi base = binario
+        String binarioHora1 = conversor.decimalABase(hora1, 2);
+        String binarioHora2 = conversor.decimalABase(hora2, 2);
+
+        //muestro
+        System.out.printf("Hora 1 (decimal): %02d --> (binario): %s\n", hora1, binarioHora1);
+        System.out.printf("Hora 2 (decimal): %02d --> (binario): %s\n", hora2, binarioHora2);
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("\n¿Desea realizar una Suma (S) o una Resta (R)? ");
+        //necesita ser mayuscula para que atienda que operacion realizr
+        String opcion = scanner.nextLine().trim().toUpperCase();
+
+        String resultado;
+        if (opcion.equals("S")) {
+            resultado = calculadora.sumaBinaria(binarioHora1, binarioHora2);
+            System.out.println("Resultado de la suma binaria: " + resultado);
+        } else if (opcion.equals("R")) {
+            resultado = calculadora.restaBinaria(binarioHora1, binarioHora2);
+            System.out.println("Resultado de la resta binaria: " + resultado);
+        } else {
+            System.out.println("Opción no válida.");
+            return;
+        }
+
+    }
+
+    /****/
+    public static void horasManuales(){
+
+    }
+
+    /**menu ayudara a elegir las horas para el usuario**/
+    public static void menu() throws InterruptedException {
+        Scanner sc = new Scanner(System.in);
+        int opcion;
+        System.out.println("¨========Eliga una de las opciones: ========");
+        System.out.println("1. Tomar dos horas del reloj automaticamente");
+        System.out.println("2. Ingresar las horas manual ");
+        System.out.println("3. Salir");
+        System.out.println("Eliga una opcion: \n");
+        opcion = sc.nextInt();
+        sc.nextLine();
+
+        switch (opcion){
+            case 1:
+                    horasAutomatico();
+                break;
+            case 2:
+                break;
+            case 3:
+                System.out.println("Saliendo del programa");
+                System.exit(0);
+                break;
+            default:
+                System.out.println("Opcion no encontrada");
+        }
+
+    }
+
     public static void main(String[] args) throws InterruptedException {
+
+        //llamando a menu
+        menu();
+
+
 
         //llamndo a mi suma binaria para probar su funcionamiento
         sumaBinaria();
