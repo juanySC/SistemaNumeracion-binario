@@ -185,9 +185,31 @@ public class Main {
 
     }
 
-    /****/
-    public static void horasManuales(){
+    /**horas manuales me ayuda a capturar por medio del teclado las horas binarias que el usuario va a
+     * utilizar**/
+    public static void horasManuales(Scanner scanner){
+        System.out.println("\n--- OPCIÓN 2: INGRESAR HORAS MANUALMENTE ---");
 
+        System.out.print("Ingrese la primera hora en binario: ");
+        String binario1 = scanner.nextLine().trim();
+
+        System.out.print("Ingrese la segunda hora en binario: ");
+        String binario2 = scanner.nextLine().trim();
+
+        System.out.print("¿Desea realizar una Suma (S) o una Resta (R)? ");
+        String opcion = scanner.nextLine().trim().toUpperCase();
+
+        String resultado;
+        if (opcion.equals("S")) {
+            resultado = calculadora.sumaBinaria(binario1, binario2);
+            System.out.println("Resultado de la suma binaria: " + resultado);
+        } else if (opcion.equals("R")) {
+            resultado = calculadora.restaBinaria(binario1, binario2);
+            System.out.println("Resultado de la resta binaria: " + resultado);
+        } else {
+            System.out.println("Opción no válida.");
+            return;
+        }
     }
 
     /**menu ayudara a elegir las horas para el usuario**/
@@ -207,6 +229,7 @@ public class Main {
                     horasAutomatico();
                 break;
             case 2:
+                    horasManuales(sc);
                 break;
             case 3:
                 System.out.println("Saliendo del programa");
