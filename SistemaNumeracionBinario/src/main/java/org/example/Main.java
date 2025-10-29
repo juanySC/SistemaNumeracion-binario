@@ -155,29 +155,50 @@ public class Main {
         Thread.sleep(3000); // Espera 3 segundos antes de obtener el demas
         int[] horaActual2 = reloj.getHoraActual();
 
+        //obteniendo hora 1
         int hora1 = horaActual1[0];
+        int minuto1 = horaActual1[1];
+        int segundo1 = horaActual1[2];
+
+        //obteniendo la hora 2
         int hora2 = horaActual2[0];
+        int minuto2 = horaActual2[1];
+        int segundo2 = horaActual2[2];
 
         //utilizo mi metodo para pasarlo a mi base = binario
         String binarioHora1 = conversor.decimalABase(hora1, 2);
+        String binarioMinuto1 = conversor.decimalABase(minuto1,2);
+        String binarioSegundo1 = conversor.decimalABase(segundo1,2);
+
         String binarioHora2 = conversor.decimalABase(hora2, 2);
+        String binarioMinuto2 = conversor.decimalABase(minuto2,2);
+        String binarioSegundo2 = conversor.decimalABase(segundo2,2);
 
         //muestro
-        System.out.printf("Hora 1 (decimal): %02d --> (binario): %s\n", hora1, binarioHora1);
-        System.out.printf("Hora 2 (decimal): %02d --> (binario): %s\n", hora2, binarioHora2);
+
+        System.out.printf("Hora 1 -> %02d:%02d:%02d    (%s : %s : %s)\n",
+                hora1, minuto1, segundo1, binarioHora1, binarioMinuto1, binarioSegundo1);
+        System.out.printf("Hora 2 -> %02d:%02d:%02d      (%s : %s : %s)\n",
+                hora2, minuto2, segundo2, binarioHora2, binarioMinuto2, binarioSegundo2);
 
         Scanner scanner = new Scanner(System.in);
         System.out.print("\n¿Desea realizar una Suma (S) o una Resta (R)? ");
         //necesita ser mayuscula para que atienda que operacion realizr
         String opcion = scanner.nextLine().trim().toUpperCase();
 
+        String resHora, resMin, resSeg;
+
         String resultado;
         if (opcion.equals("S")) {
-            resultado = calculadora.sumaBinaria(binarioHora1, binarioHora2);
-            System.out.println("Resultado de la suma binaria: " + resultado);
+            resHora = calculadora.sumaBinaria(binarioHora1, binarioHora2);
+            resMin = calculadora.sumaBinaria(binarioMinuto1, binarioMinuto2);
+            resSeg = calculadora.sumaBinaria(binarioSegundo1, binarioSegundo2);
+            System.out.println("Resultado de la suma binaria: " + resHora +" : "+ resMin+" : " + resSeg);
         } else if (opcion.equals("R")) {
-            resultado = calculadora.restaBinaria(binarioHora1, binarioHora2);
-            System.out.println("Resultado de la resta binaria: " + resultado);
+            resHora = calculadora.restaBinaria(binarioHora1, binarioHora2);
+            resMin = calculadora.restaBinaria(binarioMinuto1, binarioMinuto2);
+            resSeg = calculadora.restaBinaria(binarioSegundo1, binarioSegundo2);
+            System.out.println("Resultado de la resta binaria: " + resHora +" : "+ resMin +" : "+ resSeg);
         } else {
             System.out.println("Opción no válida.");
             return;
@@ -189,27 +210,56 @@ public class Main {
      * utilizar**/
     public static void horasManuales(Scanner scanner){
         System.out.println("\n--- OPCIÓN 2: INGRESAR HORAS MANUALMENTE ---");
+        System.out.println("Formato esperado: hora:minuto:segundo (todos en binario)");
+        System.out.println("Ejemplo: 1101:101010:1011 (equivale a 13:42:11)");
+        System.out.println("");
 
+        // Ingreso de las dos horas
         System.out.print("Ingrese la primera hora en binario: ");
-        String binario1 = scanner.nextLine().trim();
+        String horaBin1 = scanner.nextLine().trim();
 
         System.out.print("Ingrese la segunda hora en binario: ");
-        String binario2 = scanner.nextLine().trim();
+        String horaBin2 = scanner.nextLine().trim();
 
-        System.out.print("¿Desea realizar una Suma (S) o una Resta (R)? ");
+        // Separar cada parte por los ":"
+        String[] partes1 = horaBin1.split(":");
+        String[] partes2 = horaBin2.split(":");
+
+        if (partes1.length != 3 || partes2.length != 3) {
+            System.out.println("Error: formato incorrecto. Use hora:minuto:segundo");
+            return;
+        }
+
+        String binHora1 = partes1[0];
+        String binMin1 = partes1[1];
+        String binSeg1 = partes1[2];
+
+        String binHora2 = partes2[0];
+        String binMin2 = partes2[1];
+        String binSeg2 = partes2[2];
+
+        System.out.print("\n¿Desea realizar una Suma (S) o una Resta (R)? ");
         String opcion = scanner.nextLine().trim().toUpperCase();
 
-        String resultado;
+        String resHora, resMin, resSeg;
+
         if (opcion.equals("S")) {
-            resultado = calculadora.sumaBinaria(binario1, binario2);
-            System.out.println("Resultado de la suma binaria: " + resultado);
+            resHora = calculadora.sumaBinaria(binHora1, binHora2);
+            resMin = calculadora.sumaBinaria(binMin1, binMin2);
+            resSeg = calculadora.sumaBinaria(binSeg1, binSeg2);
+            System.out.println("\n Resultado de la suma:");
         } else if (opcion.equals("R")) {
-            resultado = calculadora.restaBinaria(binario1, binario2);
-            System.out.println("Resultado de la resta binaria: " + resultado);
+            resHora = calculadora.restaBinaria(binHora1, binHora2);
+            resMin = calculadora.restaBinaria(binMin1, binMin2);
+            resSeg = calculadora.restaBinaria(binSeg1, binSeg2);
+            System.out.println("\n Resultado de la resta:");
         } else {
             System.out.println("Opción no válida.");
             return;
         }
+
+        // Mostrar resultados
+        System.out.printf("Hora resultado (binario): %s:%s:%s\n", resHora, resMin, resSeg);
     }
 
     /**menu ayudara a elegir las horas para el usuario**/
