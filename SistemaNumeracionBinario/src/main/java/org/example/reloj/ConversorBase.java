@@ -28,10 +28,10 @@ public class ConversorBase {
             //divido respecto a la base
             int residuo = numTemp % base;
 
-                //variable hexadecimal: me ayuda a buscar en la propia cadena que caracter elegir
-                //insert nos ayuda a insertar en la posicion 0 el caracter que obtengo de la cadena hexadecimal
-                //charAt obtiene el caracter una posicion especifica
-                resultado.insert(0, hexadecimal.charAt(residuo));
+            //variable hexadecimal: me ayuda a buscar en la propia cadena que caracter elegir
+            //insert nos ayuda a insertar en la posicion 0 el caracter que obtengo de la cadena hexadecimal
+            //charAt obtiene el caracter una posicion especifica
+            resultado.insert(0, hexadecimal.charAt(residuo));
 
             //opero el numero segun la base que tenga
             numTemp = numTemp/base;
