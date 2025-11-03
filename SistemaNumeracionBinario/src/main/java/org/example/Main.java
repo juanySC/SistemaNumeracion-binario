@@ -57,7 +57,21 @@ public class Main {
                             conversor.decimalABase(h[0], 2),
                             conversor.decimalABase(h[1], 2),
                             conversor.decimalABase(h[2], 2));
-                    String display = "Hora: " + horaFormateada + " | Binario: " + binario;
+
+
+                    String base8  = String.format("%s:%s:%s",
+                            conversor.decimalABase(h[0], 8),
+                            conversor.decimalABase(h[1], 8),
+                            conversor.decimalABase(h[2], 8));
+                    String base16 = String.format("%s:%s:%s",
+                            conversor.decimalABase(h[0], 16),
+                            conversor.decimalABase(h[1], 16),
+                            conversor.decimalABase(h[2], 16));
+
+                    String display = "Hora: " + horaFormateada +
+                            " | Binario: " + binario +
+                            " | Octal: " + base8 +
+                            " | Hex: " + base16;
 
                     synchronized (printLock) {
                         System.out.print("\r" + display); // sobrescribe la línea del reloj
