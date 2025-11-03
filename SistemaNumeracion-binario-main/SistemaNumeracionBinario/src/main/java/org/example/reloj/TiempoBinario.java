@@ -1,5 +1,6 @@
 package org.example.reloj;
 
+//ayuda a obtener la hora, minuto y segundo como un metodo
 public class TiempoBinario {
     public String hora;
     public String minuto;

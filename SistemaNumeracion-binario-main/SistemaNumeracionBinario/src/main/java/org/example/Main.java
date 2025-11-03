@@ -15,33 +15,9 @@ public class Main {
 
     private static final Object printLock = new Object();
 
-    private static String construirBloque(int hora, int minuto, int segundo) {
-        String base10 = String.format("%02d:%02d:%02d", hora, minuto, segundo);
-        String base2 = String.format("%s:%s:%s",
-                conversor.decimalABase(hora, 2),
-                conversor.decimalABase(minuto, 2),
-                conversor.decimalABase(segundo, 2));
-        String base8 = String.format("%s:%s:%s",
-                conversor.decimalABase(hora, 8),
-                conversor.decimalABase(minuto, 8),
-                conversor.decimalABase(segundo, 8));
-        String base16 = String.format("%s:%s:%s",
-                conversor.decimalABase(hora, 16),
-                conversor.decimalABase(minuto, 16),
-                conversor.decimalABase(segundo, 16));
 
-        return new StringBuilder()
-                .append("___________________________________\n")
-                .append("              RELOJ ACTUAL\n")
-                .append("___________________________________\n")
-                .append(String.format("Base 10: %s\n", base10))
-                .append(String.format("Base  2: %s\n", base2))
-                .append(String.format("Base  8: %s\n", base8))
-                .append(String.format("Base 16: %s\n", base16))
-                .append("====================================\n")
-                .toString();
-    }
-
+    /**ClockUpdater ayuda a correr el reloj para que se vaya actualizando el reloj en las bases
+     * 2,8, 10 y 16 tomando la hora actual como su inicio**/
     private static class ClockUpdater implements Runnable {
         private volatile boolean running = true;
 
@@ -66,16 +42,20 @@ public class Main {
                             conversor.decimalABase(h[1], 16),
                             conversor.decimalABase(h[2], 16));
 
+
+                    //muestra en la consola los formatos y se actualizan
                     String display = "Hora: " + horaFormateada +
                             " | Binario: " + binario +
                             " | Octal: " + base8 +
                             " | Hex: " + base16;
 
+                    //imprimiendo las horas
                     synchronized (printLock) {
                         System.out.print("\r" + display); // sobrescribe la línea del reloj
                         System.out.flush();
                     }
 
+                    //antes de actualizar tarda 1 segundo
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -85,6 +65,9 @@ public class Main {
         }
     }
 
+    /**ninarioATtotalSegundos este metodo me ayuda a obtener en hora base 10 para una mejor visualizacion
+     * en metodos como suma o resta
+     * @param t  me ayuda a obtener el tiempo actual para actualizarlo**/
     private static int binarioATotalSegundos(TiempoBinario t) {
         int h = Integer.parseInt(t.hora, 2);
         int m = Integer.parseInt(t.minuto, 2);
@@ -106,6 +89,9 @@ public class Main {
         return new TiempoBinario(hBin, mBin, sBin);
     }
 
+
+    /**menu es para que el usuario eliga si desea hacer la resta o suma, para esto de manera manual o
+     * automatico**/
     public static void menu(Scanner sc) throws InterruptedException {
         synchronized (printLock) {
             System.out.println();
@@ -142,6 +128,9 @@ public class Main {
         }
     }
 
+
+    /**horasAutomatico 
+     *  @param scanner que me ayuda a obtener la cantidad de las sumas o restas**/
     public static void horasAutomatico(Scanner scanner) throws InterruptedException {
         synchronized (printLock) {
             System.out.println("\n--------- HORAS AUTOMÁTICAS -----------");
