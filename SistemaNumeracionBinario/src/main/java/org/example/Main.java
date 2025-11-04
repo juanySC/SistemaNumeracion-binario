@@ -1,10 +1,10 @@
-// java
 package org.example;
 
 import org.example.operaacionesAritmeticas.OperacionAritmetica;
 import org.example.reloj.ConversorBase;
 import org.example.reloj.MostrarReloj;
 import org.example.reloj.RelojPantalla;
+import org.example.reloj.TiempoBinario;
 
 import java.util.Scanner;
 
@@ -15,33 +15,9 @@ public class Main {
 
     private static final Object printLock = new Object();
 
-    private static String construirBloque(int hora, int minuto, int segundo) {
-        String base10 = String.format("%02d:%02d:%02d", hora, minuto, segundo);
-        String base2 = String.format("%s:%s:%s",
-                conversor.decimalABase(hora, 2),
-                conversor.decimalABase(minuto, 2),
-                conversor.decimalABase(segundo, 2));
-        String base8 = String.format("%s:%s:%s",
-                conversor.decimalABase(hora, 8),
-                conversor.decimalABase(minuto, 8),
-                conversor.decimalABase(segundo, 8));
-        String base16 = String.format("%s:%s:%s",
-                conversor.decimalABase(hora, 16),
-                conversor.decimalABase(minuto, 16),
-                conversor.decimalABase(segundo, 16));
 
-        return new StringBuilder()
-                .append("___________________________________\n")
-                .append("              RELOJ ACTUAL\n")
-                .append("___________________________________\n")
-                .append(String.format("Base 10: %s\n", base10))
-                .append(String.format("Base  2: %s\n", base2))
-                .append(String.format("Base  8: %s\n", base8))
-                .append(String.format("Base 16: %s\n", base16))
-                .append("====================================\n")
-                .toString();
-    }
-
+    /**ClockUpdater ayuda a correr el reloj para que se vaya actualizando el reloj en las bases
+     * 2,8, 10 y 16 tomando la hora actual como su inicio**/
     private static class ClockUpdater implements Runnable {
         private volatile boolean running = true;
 
@@ -57,8 +33,6 @@ public class Main {
                             conversor.decimalABase(h[0], 2),
                             conversor.decimalABase(h[1], 2),
                             conversor.decimalABase(h[2], 2));
-
-
                     String base8  = String.format("%s:%s:%s",
                             conversor.decimalABase(h[0], 8),
                             conversor.decimalABase(h[1], 8),
@@ -68,16 +42,20 @@ public class Main {
                             conversor.decimalABase(h[1], 16),
                             conversor.decimalABase(h[2], 16));
 
+
+                    //muestra en la consola los formatos y se actualizan
                     String display = "Hora: " + horaFormateada +
                             " | Binario: " + binario +
                             " | Octal: " + base8 +
                             " | Hex: " + base16;
 
+                    //imprimiendo las horas
                     synchronized (printLock) {
                         System.out.print("\r" + display); // sobrescribe la línea del reloj
                         System.out.flush();
                     }
 
+                    //antes de actualizar tarda 1 segundo
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -87,13 +65,38 @@ public class Main {
         }
     }
 
+    /**ninarioATtotalSegundos este metodo me ayuda a obtener en hora base 10 para una mejor visualizacion
+     * en metodos como suma o resta
+     * @param t  me ayuda a obtener el tiempo actual para actualizarlo**/
+    private static int binarioATotalSegundos(TiempoBinario t) {
+        int h = Integer.parseInt(t.hora, 2);
+        int m = Integer.parseInt(t.minuto, 2);
+        int s = Integer.parseInt(t.segundo, 2);
+        return h * 3600 + m * 60 + s;
+    }
 
-    // Mantener un único Scanner y leer fuera del lock
+    private static TiempoBinario segundosATiempoBinario(int totalSegundos) {
+        totalSegundos = ((totalSegundos % 86400) + 86400) % 86400; // normalizar en un día
+
+        int h = totalSegundos / 3600;
+        int m = (totalSegundos % 3600) / 60;
+        int s = totalSegundos % 60;
+
+        String hBin = conversor.decimalABase(h, 2);
+        String mBin = conversor.decimalABase(m, 2);
+        String sBin = conversor.decimalABase(s, 2);
+
+        return new TiempoBinario(hBin, mBin, sBin);
+    }
+
+
+    /**menu es para que el usuario eliga si desea hacer la resta o suma, para esto de manera manual o
+     * automatico**/
     public static void menu(Scanner sc) throws InterruptedException {
         synchronized (printLock) {
             System.out.println();
             System.out.println("¨========Eliga una de las opciones: ========");
-            System.out.println("1. Tomar dos horas del reloj automaticamente");
+            System.out.println("1. Tomar horas del reloj automaticamente");
             System.out.println("2. Ingresar las horas manual ");
             System.out.println("3. Salir");
             System.out.print("Eliga una opcion: ");
@@ -125,91 +128,147 @@ public class Main {
         }
     }
 
+
+    /**horasAutomatico 
+     *  @param scanner que me ayuda a obtener la cantidad de las sumas o restas**/
     public static void horasAutomatico(Scanner scanner) throws InterruptedException {
-        synchronized (printLock) { System.out.println("\n--------- Hora automatica -----------"); }
-        int[] horaActual1 = reloj.getHoraActual();
-        Thread.sleep(3000);
-        int[] horaActual2 = reloj.getHoraActual();
+        synchronized (printLock) {
+            System.out.println("\n--------- HORAS AUTOMÁTICAS -----------");
+        }
 
-        int hora1 = horaActual1[0], minuto1 = horaActual1[1], segundo1 = horaActual1[2];
-        int hora2 = horaActual2[0], minuto2 = horaActual2[1], segundo2 = horaActual2[2];
+        System.out.print("¿Cuántos tiempos deseas sumar? (2 a 6): ");
+        int cantidad = Integer.parseInt(scanner.nextLine().trim());
+        if (cantidad < 2 || cantidad > 6) {
+            synchronized (printLock) { System.out.println("Cantidad inválida. Debe estar entre 2 y 6."); }
+            return;
+        }
 
-        String binarioHora1 = conversor.decimalABase(hora1, 2);
-        String binarioMinuto1 = conversor.decimalABase(minuto1,2);
-        String binarioSegundo1 = conversor.decimalABase(segundo1,2);
+        TiempoBinario[] tiempos = new TiempoBinario[cantidad];
+        for (int i = 0; i < cantidad; i++) {
+            int[] hms = reloj.getHoraActual(); // [hora, minuto, segundo]
 
-        String binarioHora2 = conversor.decimalABase(hora2, 2);
-        String binarioMinuto2 = conversor.decimalABase(minuto2,2);
-        String binarioSegundo2 = conversor.decimalABase(segundo2,2);
+            String hBin = conversor.decimalABase(hms[0], 2);
+            String mBin = conversor.decimalABase(hms[1], 2);
+            String sBin = conversor.decimalABase(hms[2], 2);
+
+            tiempos[i] = new TiempoBinario(hBin, mBin, sBin);
+
+            synchronized (printLock) {
+                System.out.printf("Tiempo %d -> %02d:%02d:%02d (binario: %s:%s:%s)\n",
+                        i + 1, hms[0], hms[1], hms[2], hBin, mBin, sBin);
+            }
+            Thread.sleep(2000);
+        }
 
         synchronized (printLock) {
-            System.out.printf("Hora 1 -> %02d:%02d:%02d    (%s : %s : %s)\n",
-                    hora1, minuto1, segundo1, binarioHora1, binarioMinuto1, binarioSegundo1);
-            System.out.printf("Hora 2 -> %02d:%02d:%02d      (%s : %s : %s)\n",
-                    hora2, minuto2, segundo2, binarioHora2, binarioMinuto2, binarioSegundo2);
             System.out.print("\n¿Desea realizar una Suma (S) o una Resta (R)? ");
             System.out.flush();
         }
         String opcion = scanner.nextLine().trim().toUpperCase();
 
-        String resHora, resMin, resSeg;
-        if ("S".equals(opcion)) {
-            resHora = calculadora.sumaBinaria(binarioHora1, binarioHora2);
-            resMin = calculadora.sumaBinaria(binarioMinuto1, binarioMinuto2);
-            resSeg = calculadora.sumaBinaria(binarioSegundo1, binarioSegundo2);
-            synchronized (printLock) { System.out.println("Resultado de la suma binaria: " + resHora +" : "+ resMin+" : " + resSeg); }
-        } else if ("R".equals(opcion)) {
-            resHora = calculadora.restaBinaria(binarioHora1, binarioHora2);
-            resMin = calculadora.restaBinaria(binarioMinuto1, binarioMinuto2);
-            resSeg = calculadora.restaBinaria(binarioSegundo1, binarioSegundo2);
-            synchronized (printLock) { System.out.println("Resultado de la resta binaria: " + resHora +" : "+ resMin +" : "+ resSeg); }
-        } else {
-            synchronized (printLock) { System.out.println("Opción no válida."); }
+        int resultadoSegundos = binarioATotalSegundos(tiempos[0]);
+        for (int i = 1; i < cantidad; i++) {
+            int currentSegundos = binarioATotalSegundos(tiempos[i]);
+            if ("S".equals(opcion)) {
+                resultadoSegundos += currentSegundos;
+            } else if ("R".equals(opcion)) {
+                resultadoSegundos -= currentSegundos;
+            } else {
+                synchronized (printLock) { System.out.println("Opción no válida."); }
+                return;
+            }
+        }
+
+        TiempoBinario resultado = segundosATiempoBinario(resultadoSegundos);
+
+        int hDec = Integer.parseInt(resultado.hora, 2);
+        int mDec = Integer.parseInt(resultado.minuto, 2);
+        int sDec = Integer.parseInt(resultado.segundo, 2);
+
+        synchronized (printLock) {
+            System.out.println("\n====================================");
+            System.out.println("Resultado final:");
+            System.out.printf("Binario: %s:%s:%s\n", resultado.hora, resultado.minuto, resultado.segundo);
+            System.out.printf("Decimal: %02d:%02d:%02d\n", hDec, mDec, sDec);
+            System.out.println("====================================");
         }
     }
 
     public static void horasManuales(Scanner scanner) {
         synchronized (printLock) {
-            System.out.println("\n--- OPCIÓN 2: INGRESAR HORAS MANUALMENTE ---");
-            System.out.println("Formato esperado: hora:minuto:segundo (todos en binario)");
-            System.out.println("");
-            System.out.print("Ingrese la primera hora en binario: ");
+            System.out.println("\n--- OPCIÓN 2: INGRESAR TIEMPOS MANUALMENTE ---");
+            System.out.print("¿Cuántos tiempos deseas sumar? (2 a 6): ");
             System.out.flush();
         }
-        String horaBin1 = scanner.nextLine().trim();
 
-        synchronized (printLock) { System.out.print("Ingrese la segunda hora en binario: "); System.out.flush(); }
-        String horaBin2 = scanner.nextLine().trim();
+        int cantidad = Integer.parseInt(scanner.nextLine().trim());
+        if (cantidad < 2 || cantidad > 6) {
+            synchronized (printLock) { System.out.println("Cantidad inválida. Debe estar entre 2 y 6."); }
+            return;
+        }
 
-        String[] partes1 = horaBin1.split(":");
-        String[] partes2 = horaBin2.split(":");
-        if (partes1.length != 3 || partes2.length != 3) { synchronized (printLock) { System.out.println("Error: formato incorrecto."); } return; }
+        TiempoBinario[] tiempos = new TiempoBinario[cantidad];
+        for (int i = 0; i < cantidad; i++) {
+            synchronized (printLock) {
+                System.out.printf("Ingrese la hora %d en binario (ejemplo: 1010 = 10): ", i + 1);
+                System.out.flush();
+            }
+            String h = scanner.nextLine().trim();
 
-        synchronized (printLock) { System.out.print("\n¿Desea realizar una Suma (S) o una Resta (R)? "); System.out.flush(); }
+            synchronized (printLock) {
+                System.out.printf("Ingrese el minuto %d en binario (ejemplo: 1010 = 10): ", i + 1);
+                System.out.flush();
+            }
+            String m = scanner.nextLine().trim();
+
+            synchronized (printLock) {
+                System.out.printf("Ingrese el segundo %d en binario (ejemplo: 1010 = 10): ", i + 1);
+                System.out.flush();
+            }
+            String s = scanner.nextLine().trim();
+
+            tiempos[i] = new TiempoBinario(h, m, s);
+        }
+
+        synchronized (printLock) {
+            System.out.print("\n¿Desea realizar una Suma (S) o una Resta (R)? ");
+            System.out.flush();
+        }
         String opcion = scanner.nextLine().trim().toUpperCase();
 
-        String resHora, resMin, resSeg;
-        if ("S".equals(opcion)) {
-            resHora = calculadora.sumaBinaria(partes1[0], partes2[0]);
-            resMin = calculadora.sumaBinaria(partes1[1], partes2[1]);
-            resSeg = calculadora.sumaBinaria(partes1[2], partes2[2]);
-            synchronized (printLock) { System.out.println("\n Resultado de la suma:"); System.out.printf("Hora resultado (binario): %s:%s:%s\n", resHora, resMin, resSeg); }
-        } else if ("R".equals(opcion)) {
-            resHora = calculadora.restaBinaria(partes1[0], partes2[0]);
-            resMin = calculadora.restaBinaria(partes1[1], partes2[1]);
-            resSeg = calculadora.restaBinaria(partes1[2], partes2[2]);
-            synchronized (printLock) { System.out.println("\n Resultado de la resta:"); System.out.printf("Hora resultado (binario): %s:%s:%s\n", resHora, resMin, resSeg); }
-        } else {
-            synchronized (printLock) { System.out.println("Opción no válida."); }
+        int resultadoSegundos = binarioATotalSegundos(tiempos[0]);
+        for (int i = 1; i < cantidad; i++) {
+            int currentSegundos = binarioATotalSegundos(tiempos[i]);
+            if ("S".equals(opcion)) {
+                resultadoSegundos += currentSegundos;
+            } else if ("R".equals(opcion)) {
+                resultadoSegundos -= currentSegundos;
+            } else {
+                synchronized (printLock) { System.out.println("Opción no válida."); }
+                return;
+            }
+        }
+
+        TiempoBinario resultado = segundosATiempoBinario(resultadoSegundos);
+
+        int hDec = Integer.parseInt(resultado.hora, 2);
+        int mDec = Integer.parseInt(resultado.minuto, 2);
+        int sDec = Integer.parseInt(resultado.segundo, 2);
+
+        synchronized (printLock) {
+            System.out.println("\n====================================");
+            System.out.println("Resultado final:");
+            System.out.printf("Binario: %s:%s:%s\n", resultado.hora, resultado.minuto, resultado.segundo);
+            System.out.printf("Decimal: %02d:%02d:%02d\n", hDec, mDec, sDec);
+            System.out.println("====================================");
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
-        // iniciar updater daemon (reloj estático con \r)
-        ClockUpdater updater = new ClockUpdater();
-        Thread hiloReloj = new Thread(updater, "ClockUpdater");
-        hiloReloj.setDaemon(true);
-        hiloReloj.start();
+        // ClockUpdater updater = new ClockUpdater();
+        //Thread hiloReloj = new Thread(updater, "ClockUpdater");
+        //hiloReloj.setDaemon(true);
+        //hiloReloj.start();
 
         Scanner sc = new Scanner(System.in);
         while (true) {
@@ -225,10 +284,9 @@ public class Main {
             }
         }
 
-        updater.stop();
-        hiloReloj.interrupt();
-        try { hiloReloj.join(1000); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }
+        //    updater.stop();
+        //   hiloReloj.interrupt();
+        //  try { hiloReloj.join(1000); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }
         sc.close();
     }
-
 }
