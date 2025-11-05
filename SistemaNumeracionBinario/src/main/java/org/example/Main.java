@@ -110,7 +110,7 @@ public class Main {
     }
 
     // ------------------ lecturas robustas ------------------
-    // readLine no-bloqueante con poll + timeout helper
+// readLine no-bloqueante con poll + timeout helper
     private static String readLineWithTimeout(Screen screen, TextGraphics tg, int promptRow, int promptCol, int timeoutSeconds) throws IOException {
         StringBuilder sb = new StringBuilder();
         long deadline = System.currentTimeMillis() + timeoutSeconds * 1000L;
@@ -292,8 +292,8 @@ public class Main {
         popup.append("Resultado final:\n");
         popup.append(String.format("Binario: %s:%s:%s\n",  resultado.hora, resultado.minuto, resultado.segundo));
         popup.append(String.format("Decimal: %02d:%02d:%02d\n", hDec, mDec, sDec));
-        popup.append(String.format("Octal  : %s:%s:%s\n",   hOc,   mOc,   sOc));
-        popup.append(String.format("Hex    : %s:%s:%s\n",   hHex,  mHex,  sHex));
+        popup.append(String.format("Octal  : %s:%s:%s\n",   conversor.decimalABase(hDec,8),   conversor.decimalABase(mDec,8),   conversor.decimalABase(sDec,8)));
+        popup.append(String.format("Hex    : %s:%s:%s\n",   conversor.decimalABase(hDec,16),  conversor.decimalABase(mDec,16),  conversor.decimalABase(sDec,16)));
 
         JOptionPane.showMessageDialog(null, popup.toString(), "Resultado", JOptionPane.INFORMATION_MESSAGE);
 
@@ -332,170 +332,115 @@ public class Main {
     // ------------------ Opcion 2 (manual) - MODIFICADA: ahora ingresa DECIMALES y devuelve en bases 2,8,10,16
     private static void opcion2_horasManuales(Screen screen, TextGraphics tg) throws IOException {
         int headerRow = MENU_START_ROW + 6;
-        writeLines(screen, tg, headerRow, List.of("--- OPCIÓN 2: INGRESAR TIEMPOS MANUALMENTE (en DECIMAL) ---"));
+        writeLines(screen, tg, headerRow, List.of("--- OPCIÓN 2: SUMAR/RESTAR A LA HORA ACTUAL (DECIMAL) ---"));
 
-        int cantidadRow = headerRow + 2;
-        tg.putString(1, cantidadRow, "¿Cuántos tiempos deseas sumar? (2 a 6): ");
+        // Mostrar la hora actual (base 10, 2, 8, 16) como punto de partida
+        int[] ahora = reloj.getHoraActual();
+        String ahoraBase10 = String.format("%02d:%02d:%02d", ahora[0], ahora[1], ahora[2]);
+        String ahoraBin  = String.format("%s:%s:%s", conversor.decimalABase(ahora[0],2), conversor.decimalABase(ahora[1],2), conversor.decimalABase(ahora[2],2));
+        String ahoraOct  = String.format("%s:%s:%s", conversor.decimalABase(ahora[0],8), conversor.decimalABase(ahora[1],8), conversor.decimalABase(ahora[2],8));
+        String ahoraHex  = String.format("%s:%s:%s", conversor.decimalABase(ahora[0],16), conversor.decimalABase(ahora[1],16), conversor.decimalABase(ahora[2],16));
+
+        writeLines(screen, tg, headerRow + 2, List.of(
+                "Hora actual (Base 10): " + ahoraBase10,
+                "Binario: " + ahoraBin,
+                "Octal:   " + ahoraOct,
+                "Hex:     " + ahoraHex,
+                ""
+        ));
+
+        // Pedir si desea sumar o restar
+        int opRow = headerRow + 8;
+        tg.putString(1, opRow, "¿Desea Sumar (S) o Restar (R) a la hora actual? ");
         screen.refresh();
 
-        String cantidadStr = readLineWithTimeout(screen, tg, cantidadRow, 38, 30);
-        if (cantidadStr == null || cantidadStr.trim().isEmpty()) {
-            String single = readSingleCharWithTimeout(screen, tg, cantidadRow, 38, 5);
-            if (single != null) cantidadStr = single;
-        }
-        if (cantidadStr == null || cantidadStr.trim().isEmpty()) {
-            cantidadStr = fallbackModalAndEcho(screen, tg, cantidadRow + 2, "¿Cuántos tiempos deseas sumar? (2 a 6):", "Entrada cantidad");
-            if (cantidadStr.isEmpty()) { writeLines(screen, tg, cantidadRow + 4, List.of("Operación cancelada.")); return; }
-        }
-
-        int cantidad;
-        try { cantidad = Integer.parseInt(cantidadStr); }
-        catch (Exception e) { writeLines(screen, tg, cantidadRow + 4, List.of("Cantidad inválida.")); return; }
-        if (cantidad < 2 || cantidad > 6) { writeLines(screen, tg, cantidadRow + 4, List.of("Cantidad inválida. Debe estar entre 2 y 6.")); return; }
-
-        TiempoBinario[] tiempos = new TiempoBinario[cantidad];
-        int rowCursor = cantidadRow + 4;
-
-        // Pedimos cada componente EN DECIMAL (validamos) y convertimos a binario internamente
-        for (int i = 0; i < cantidad; i++) {
-            // HORA (0-23)
-            writeLines(screen, tg, rowCursor, List.of(String.format("Ingrese la HORA %d en DECIMAL (0-23): ", i+1)));
-            String hStr = readLineWithTimeout(screen, tg, rowCursor, 44, 30);
-            if (hStr == null || hStr.trim().isEmpty()) {
-                hStr = fallbackModalAndEcho(screen, tg, rowCursor, "Ingrese la HORA " + (i+1) + " en DECIMAL (0-23):", "Hora decimal");
-                if (hStr.isEmpty()) { writeLines(screen, tg, rowCursor + 2, List.of("Operación cancelada.")); return; }
-            }
-
-            int hDec;
-            try { hDec = Integer.parseInt(hStr.trim()); }
-            catch (Exception e) { writeLines(screen, tg, rowCursor + 2, List.of("Hora inválida. Debe ser entero 0-23.")); return; }
-            if (hDec < 0 || hDec > 23) { writeLines(screen, tg, rowCursor + 2, List.of("Hora fuera de rango (0-23).")); return; }
-
-            // MINUTO (0-59)
-            writeLines(screen, tg, rowCursor + 1, List.of(String.format("Ingrese el MINUTO %d en DECIMAL (0-59): ", i+1)));
-            String mStr = readLineWithTimeout(screen, tg, rowCursor + 1, 46, 30);
-            if (mStr == null || mStr.trim().isEmpty()) {
-                mStr = fallbackModalAndEcho(screen, tg, rowCursor + 1, "Ingrese el MINUTO " + (i+1) + " en DECIMAL (0-59):", "Minuto decimal");
-                if (mStr.isEmpty()) { writeLines(screen, tg, rowCursor + 3, List.of("Operación cancelada.")); return; }
-            }
-
-            int mDec;
-            try { mDec = Integer.parseInt(mStr.trim()); }
-            catch (Exception e) { writeLines(screen, tg, rowCursor + 3, List.of("Minuto inválido. Debe ser entero 0-59.")); return; }
-            if (mDec < 0 || mDec > 59) { writeLines(screen, tg, rowCursor + 3, List.of("Minuto fuera de rango (0-59).")); return; }
-
-            // SEGUNDO (0-59)
-            writeLines(screen, tg, rowCursor + 2, List.of(String.format("Ingrese el SEGUNDO %d en DECIMAL (0-59): ", i+1)));
-            String sStr = readLineWithTimeout(screen, tg, rowCursor + 2, 46, 30);
-            if (sStr == null || sStr.trim().isEmpty()) {
-                sStr = fallbackModalAndEcho(screen, tg, rowCursor + 2, "Ingrese el SEGUNDO " + (i+1) + " en DECIMAL (0-59):", "Segundo decimal");
-                if (sStr.isEmpty()) { writeLines(screen, tg, rowCursor + 4, List.of("Operación cancelada.")); return; }
-            }
-
-            int sDec;
-            try { sDec = Integer.parseInt(sStr.trim()); }
-            catch (Exception e) { writeLines(screen, tg, rowCursor + 4, List.of("Segundo inválido. Debe ser entero 0-59.")); return; }
-            if (sDec < 0 || sDec > 59) { writeLines(screen, tg, rowCursor + 4, List.of("Segundo fuera de rango (0-59).")); return; }
-
-            // Convertir a binario usando conversor y almacenar en TiempoBinario
-            String hBin = conversor.decimalABase(hDec, 2);
-            String mBin = conversor.decimalABase(mDec, 2);
-            String sBin = conversor.decimalABase(sDec, 2);
-
-            tiempos[i] = new TiempoBinario(hBin, mBin, sBin);
-
-            // Mostrar lo ingresado (decimal + binario) para confirmación
-            writeLines(screen, tg, rowCursor, List.of(
-                    String.format("Ingresado tiempo %d -> %02d:%02d:%02d (binario: %s:%s:%s)", i+1, hDec, mDec, sDec, hBin, mBin, sBin)
-            ));
-
-            rowCursor += 4;
-        }
-
-        int promptRow = rowCursor;
-        tg.putString(1, promptRow, "¿Desea realizar una Suma (S) o una Resta (R)? ");
-        screen.refresh();
-
-        String opcion = readLineWithTimeout(screen, tg, promptRow, 44, 25);
+        String opcion = readLineWithTimeout(screen, tg, opRow, 48, 25);
         if (opcion == null || opcion.trim().isEmpty()) {
-            String single = readSingleCharWithTimeout(screen, tg, promptRow, 44, 5);
+            String single = readSingleCharWithTimeout(screen, tg, opRow, 48, 8);
             if (single != null) opcion = single;
         }
         if (opcion == null || opcion.trim().isEmpty()) {
-            opcion = fallbackModalAndEcho(screen, tg, promptRow + 2, "¿Desea realizar una Suma (S) o una Resta (R)? (S/R)", "Entrada S/R");
-            if (opcion.isEmpty()) { writeLines(screen, tg, promptRow + 4, List.of("Operación cancelada.")); return; }
+            opcion = fallbackModalAndEcho(screen, tg, opRow + 2, "¿Desea Sumar (S) o Restar (R)? (S/R)", "S/R");
+            if (opcion.isEmpty()) { writeLines(screen, tg, opRow + 4, List.of("Operación cancelada.")); return; }
         }
-
         opcion = opcion.trim().toUpperCase();
-        writeLines(screen, tg, promptRow + 2, List.of("DEBUG: opcion recibida = " + opcion));
-
-        int resultadoSegundos = binarioATotalSegundos(tiempos[0]);
-        for (int i = 1; i < cantidad; i++) {
-            int currentSegundos = binarioATotalSegundos(tiempos[i]);
-            if ("S".equals(opcion)) resultadoSegundos += currentSegundos;
-            else if ("R".equals(opcion)) resultadoSegundos -= currentSegundos;
-            else { writeLines(screen, tg, promptRow + 4, List.of("Opción no válida.")); return; }
+        if (!opcion.equals("S") && !opcion.equals("R")) {
+            writeLines(screen, tg, opRow + 2, List.of("Opción inválida. Debes elegir S o R."));
+            return;
         }
 
-        TiempoBinario resultado = segundosATiempoBinario(resultadoSegundos);
+        // Pedir horas a sumar/restar (decimal)
+        int hRow = opRow + 4;
+        tg.putString(1, hRow, "Ingrese horas a sumar/restar (entero >=0): ");
+        screen.refresh();
+        String horasStr = readLineWithTimeout(screen, tg, hRow, 44, 30);
+        if (horasStr == null || horasStr.trim().isEmpty()) {
+            horasStr = fallbackModalAndEcho(screen, tg, hRow + 2, "Ingrese horas a sumar/restar (entero >=0):", "Horas (decimal)");
+            if (horasStr.isEmpty()) { writeLines(screen, tg, hRow + 4, List.of("Operación cancelada.")); return; }
+        }
+        int horasDelta;
+        try { horasDelta = Integer.parseInt(horasStr.trim()); if (horasDelta < 0) throw new NumberFormatException(); }
+        catch (Exception e) { writeLines(screen, tg, hRow + 2, List.of("Horas inválidas. Debe ser entero >= 0.")); return; }
+
+        // Pedir minutos a sumar/restar (decimal)
+        int mRow = hRow + 4;
+        tg.putString(1, mRow, "Ingrese minutos a sumar/restar (0-59): ");
+        screen.refresh();
+        String minutosStr = readLineWithTimeout(screen, tg, mRow, 40, 30);
+        if (minutosStr == null || minutosStr.trim().isEmpty()) {
+            minutosStr = fallbackModalAndEcho(screen, tg, mRow + 2, "Ingrese minutos a sumar/restar (0-59):", "Minutos (decimal)");
+            if (minutosStr.isEmpty()) { writeLines(screen, tg, mRow + 4, List.of("Operación cancelada.")); return; }
+        }
+        int minutosDelta;
+        try { minutosDelta = Integer.parseInt(minutosStr.trim()); if (minutosDelta < 0 || minutosDelta > 59) throw new NumberFormatException(); }
+        catch (Exception e) { writeLines(screen, tg, mRow + 2, List.of("Minutos inválidos. Debe ser 0..59.")); return; }
+
+        // Calcula resultado usando la hora actual como base
+        int totalAhoraSeg = ahora[0] * 3600 + ahora[1] * 60 + ahora[2];
+        int deltaSeg = horasDelta * 3600 + minutosDelta * 60;
+        int resultadoSeg;
+        if (opcion.equals("S")) resultadoSeg = totalAhoraSeg + deltaSeg;
+        else resultadoSeg = totalAhoraSeg - deltaSeg;
+
+        // normaliza y convierte a TiempoBinario
+        TiempoBinario resultado = segundosATiempoBinario(resultadoSeg);
         int hDec = Integer.parseInt(resultado.hora, 2);
         int mDec = Integer.parseInt(resultado.minuto, 2);
         int sDec = Integer.parseInt(resultado.segundo, 2);
 
-        // Mostrar resultado en las 4 bases
-        String binRes = String.format("%s:%s:%s", resultado.hora, resultado.minuto, resultado.segundo);
-        String octHora = conversor.decimalABase(hDec, 8);
-        String octMin = conversor.decimalABase(mDec, 8);
-        String octSeg = conversor.decimalABase(sDec, 8);
-        String hexHora = conversor.decimalABase(hDec, 16);
-        String hexMin = conversor.decimalABase(mDec, 16);
-        String hexSeg = conversor.decimalABase(sDec, 16);
+        // obtener octal y hex usando conversor
+        String hOct = conversor.decimalABase(hDec, 8);
+        String mOct = conversor.decimalABase(mDec, 8);
+        String sOct = conversor.decimalABase(sDec, 8);
 
+        String hHex = conversor.decimalABase(hDec, 16);
+        String mHex = conversor.decimalABase(mDec, 16);
+        String sHex = conversor.decimalABase(sDec, 16);
+
+        // Mostrar resultados en pantalla y en modal
         List<String> out = new ArrayList<>();
         out.add("====================================");
+        out.add("Hora base (actual): " + ahoraBase10);
+        out.add("Operación: " + (opcion.equals("S") ? "SUMA" : "RESTA") + "  (+ " + horasDelta + "h " + minutosDelta + "m)");
         out.add("Resultado final:");
-        out.add(String.format("Binario: %s", binRes));
-        out.add(String.format("Octal : %s:%s:%s", octHora, octMin, octSeg));
+        out.add(String.format("Binario: %s:%s:%s", resultado.hora, resultado.minuto, resultado.segundo));
         out.add(String.format("Decimal: %02d:%02d:%02d", hDec, mDec, sDec));
-        out.add(String.format("Hex   : %s:%s:%s", hexHora, hexMin, hexSeg));
+        out.add(String.format("Octal  : %s:%s:%s", hOct, mOct, sOct));
+        out.add(String.format("Hex    : %s:%s:%s", hHex, mHex, sHex));
         out.add("====================================");
-        writeLines(screen, tg, promptRow + 4, out);
+        writeLines(screen, tg, mRow + 4, out);
 
         StringBuilder popup = new StringBuilder();
         popup.append("Resultado final:\n");
-        popup.append(String.format("Binario: %s\n", binRes));
+        popup.append(String.format("Binario: %s:%s:%s\n", resultado.hora, resultado.minuto, resultado.segundo));
         popup.append(String.format("Decimal: %02d:%02d:%02d\n", hDec, mDec, sDec));
-        popup.append(String.format("Octal : %s:%s:%s\n", octHora, octMin, octSeg));
-        popup.append(String.format("Hex   : %s:%s:%s\n", hexHora, hexMin, hexSeg));
+        popup.append(String.format("Octal  : %s:%s:%s\n", hOct, mOct, sOct));
+        popup.append(String.format("Hex    : %s:%s:%s\n", hHex, mHex, sHex));
         JOptionPane.showMessageDialog(null, popup.toString(), "Resultado", JOptionPane.INFORMATION_MESSAGE);
 
-        int askRow = promptRow + 10;
-        tg.putString(1, askRow, "Presiona Y para salir o N para volver al menú: ");
-        screen.refresh();
-
-        String resp = readSingleCharWithTimeout(screen, tg, askRow, 42, 8);
-        if (resp == null || resp.trim().isEmpty()) {
-            int sel = JOptionPane.showConfirmDialog(null, "¿Deseas salir del programa? (Sí = salir, No = volver al menú)", "Salir?", JOptionPane.YES_NO_OPTION);
-            if (sel == JOptionPane.YES_OPTION) {
-                try { screen.stopScreen(); } catch (IOException ignored) {}
-                System.exit(0);
-            } else {
-                clearArea(screen, tg, MENU_START_ROW, 30);
-                drawMenu(screen, tg);
-                return;
-            }
-        } else {
-            resp = resp.trim().toUpperCase();
-            writeLines(screen, tg, askRow + 1, List.of("Elección: " + resp));
-            if ("Y".equals(resp) || "S".equals(resp)) {
-                try { screen.stopScreen(); } catch (IOException ignored) {}
-                System.exit(0);
-            } else {
-                clearArea(screen, tg, MENU_START_ROW, 30);
-                drawMenu(screen, tg);
-                return;
-            }
-        }
+        // volver al menú (limpiando el área)
+        clearArea(screen, tg, MENU_START_ROW, 30);
+        drawMenu(screen, tg);
     }
 
     // ------------------ main ------------------
@@ -557,4 +502,5 @@ public class Main {
             screen.stopScreen();
         }
     }
+
 }
