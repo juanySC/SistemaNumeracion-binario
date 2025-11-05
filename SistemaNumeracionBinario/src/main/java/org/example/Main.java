@@ -271,6 +271,14 @@ public class Main {
         int mDec = Integer.parseInt(resultado.minuto, 2);
         int sDec = Integer.parseInt(resultado.segundo, 2);
 
+        int hOc = Integer.parseInt(resultado.hora, 8);
+        int mOc = Integer.parseInt(resultado.minuto, 8);
+        int sOc = Integer.parseInt(resultado.segundo, 8);
+
+        int hHex = Integer.parseInt(resultado.hora, 16);
+        int mHex = Integer.parseInt(resultado.minuto, 16);
+        int sHex = Integer.parseInt(resultado.segundo, 16);
+
         List<String> out = new ArrayList<>();
         out.add("====================================");
         out.add("Resultado final:");
@@ -279,11 +287,14 @@ public class Main {
         out.add("====================================");
         writeLines(screen, tg, promptRow + 4, out);
 
-        // mostrar en modal también (por si la terminal no se ve bien)
+        // mostrar en todas las bases el reusltado de la suma o resta
         StringBuilder popup = new StringBuilder();
         popup.append("Resultado final:\n");
-        popup.append(String.format("Binario: %s:%s:%s\n", resultado.hora, resultado.minuto, resultado.segundo));
+        popup.append(String.format("Binario: %s:%s:%s\n",  resultado.hora, resultado.minuto, resultado.segundo));
         popup.append(String.format("Decimal: %02d:%02d:%02d\n", hDec, mDec, sDec));
+        popup.append(String.format("Octal  : %s:%s:%s\n",   hOc,   mOc,   sOc));
+        popup.append(String.format("Hex    : %s:%s:%s\n",   hHex,  mHex,  sHex));
+
         JOptionPane.showMessageDialog(null, popup.toString(), "Resultado", JOptionPane.INFORMATION_MESSAGE);
 
         // Preguntar si desea salir (preferencia Lanterna)
