@@ -39,4 +39,65 @@ public class ConversorBase {
         //retorno el StringBuilder ya convertido en un String
         return resultado.toString();
     }
+
+    public static void mostrarHoraBase(int h, int m, int s) {
+        // Calculamos las bases
+        String binario = String.format("%s:%s:%s",
+                Integer.toBinaryString(h),
+                Integer.toBinaryString(m),
+                Integer.toBinaryString(s));
+
+        String octal = String.format("%s:%s:%s",
+                Integer.toOctalString(h),
+                Integer.toOctalString(m),
+                Integer.toOctalString(s));
+
+        String hexa = String.format("%s:%s:%s",
+                Integer.toHexString(h).toUpperCase(),
+                Integer.toHexString(m).toUpperCase(),
+                Integer.toHexString(s).toUpperCase());
+
+        // Imprimimos todo en un bloque separado y legible
+        System.out.println("___________________________________");
+        System.out.println("              RELOJ ACTUAL");
+        System.out.println("___________________________________");
+        System.out.println("Base 10: " + String.format("%02d:%02d:%02d", h, m, s));
+        System.out.println("Base  2: " + binario);
+        System.out.println("Base  8: " + octal);
+        System.out.println("Base 16: " + hexa);
+        System.out.println("====================================");
+    }
+
+    /**
+     * Convierte una cadena que representa un número en la base indicada a su valor decimal (int).
+     * Admite bases entre 2 y 16. Para base > 10 acepta letras mayúsculas A-F.
+     * Lanzará NumberFormatException si encuentra un carácter inválido.
+     */
+    public int baseStringToDecimal(String s, int base) {
+        if (s == null || s.isEmpty()) {
+            throw new NumberFormatException("Cadena vacía");
+        }
+        if (base < 2 || base > 16) {
+            throw new IllegalArgumentException("Base debe ser entre 2 y 16");
+        }
+        s = s.trim().toUpperCase();
+        int result = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            int value;
+            if (c >= '0' && c <= '9') {
+                value = c - '0';
+            } else if (c >= 'A' && c <= 'F') {
+                value = 10 + (c - 'A');
+            } else {
+                throw new NumberFormatException("Carácter inválido para la base: " + c);
+            }
+            if (value >= base) {
+                throw new NumberFormatException("Dígito '" + c + "' no válido para base " + base);
+            }
+            result = result * base + value;
+        }
+        return result;
+    }
+
 }
