@@ -40,7 +40,7 @@ public class ConversorBase {
         return resultado.toString();
     }
 
-    public static void mostrarHoraBase(int h, int m, int s) {
+    /*  public static void mostrarHoraBase(int h, int m, int s) {
         // Calculamos las bases
         String binario = String.format("%s:%s:%s",
                 Integer.toBinaryString(h),
@@ -66,7 +66,8 @@ public class ConversorBase {
         System.out.println("Base  8: " + octal);
         System.out.println("Base 16: " + hexa);
         System.out.println("====================================");
-    }
+    }*/
+
 
     /**
      * Convierte una cadena que representa un número en la base indicada a su valor decimal (int).
